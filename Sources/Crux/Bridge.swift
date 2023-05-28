@@ -51,6 +51,19 @@ public struct BridgeConfiguration {
 		
 		return nil
 	}
+	
+	public init(
+		devURL: URL? = nil,
+		localURL: URL? = nil,
+		remoteURL: URL? = nil,
+		handlerName: String,
+		scriptURL: URL) {
+		self.devURL = devURL
+		self.localURL = localURL
+		self.remoteURL = remoteURL
+		self.handlerName = handlerName
+		self.scriptURL = scriptURL
+	}
 }
 
 open class Bridge: NSObject {
