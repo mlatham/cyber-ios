@@ -11,7 +11,7 @@ public protocol BridgeMiddleware: AnyObject {
 	func dispatchToScript(_ message: Message)
 }
 
-open class BridgeConfiguration {
+public struct BridgeConfiguration {
 	private static var _bundle: Bundle {
         #if SWIFT_PACKAGE
         return Bundle.module
