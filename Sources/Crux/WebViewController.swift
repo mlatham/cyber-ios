@@ -1,11 +1,11 @@
 import Foundation
 import WebKit
 
-class WebViewController: UIViewController {
-	let webView: WKWebView
-	let bridge: Bridge
+open class WebViewController: UIViewController {
+	public let webView: WKWebView
+	public let bridge: Bridge
 
-	init(configuration: BridgeConfiguration, webViewConfiguration: WKWebViewConfiguration? = nil) {
+	public init(configuration: BridgeConfiguration, webViewConfiguration: WKWebViewConfiguration? = nil) {
 		let webViewConfiguration = webViewConfiguration ?? {
 			let configuration = WKWebViewConfiguration()
 			configuration.preferences.isTextInteractionEnabled = false
@@ -18,18 +18,18 @@ class WebViewController: UIViewController {
 		super.init(nibName: nil, bundle: nil)
 	}
 	
-	required init?(coder: NSCoder) {
+	public required init?(coder: NSCoder) {
 		fatalError("Not supported")
 	}
 	
-	override func viewDidLoad() {
+	public override func viewDidLoad() {
 		super.viewDidLoad()
 		
 		self.view.addSubview(webView)
 		activateWebViewConstraints()
 	}
 	
-	func activateWebViewConstraints() {
+	public func activateWebViewConstraints() {
 		webView.translatesAutoresizingMaskIntoConstraints = false
 		NSLayoutConstraint.activate([
             webView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -39,7 +39,7 @@ class WebViewController: UIViewController {
         ])
 	}
 	
-	func dispatchToScript(_ message: Message) {
+	public func dispatchToScript(_ message: Message) {
 		self.bridge.dispatchToScript(message)
     }
 }

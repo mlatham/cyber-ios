@@ -2,11 +2,11 @@ import Foundation
 import SwiftUI
 import WebKit
 
-protocol BridgeDelegate: AnyObject {
+public protocol BridgeDelegate: AnyObject {
 	func didReceive(_ message: Message)
 }
 
-protocol BridgeMiddleware: AnyObject {
+public protocol BridgeMiddleware: AnyObject {
 	func dispatchToNative(_ message: Message)
 	func dispatchToScript(_ message: Message)
 }
@@ -20,22 +20,24 @@ open class BridgeConfiguration {
         #endif
     }
     
-	static let DEFAULT_HANDLER_NAME = "crux"
-	static let DEFAULT_SCRIPT_URL = _bundle.url(forResource: "ios-native-adapter", withExtension: "js")!
+	public static let DEFAULT_HANDLER_NAME = "crux"
+	public static let DEFAULT_SCRIPT_URL = _bundle.url(
+		forResource: "ios-native-adapter",
+		withExtension: "js")!
 
 	// Development URL, to load in DEBUG configurations.
-	var devURL: URL? = URL(string: "http://localhost:8081/")
+	public var devURL: URL? = URL(string: "http://localhost:8081/")
 
 	// Local (bundle or documents) URL, for allowing read file access.
-	var localURL: URL? = nil
+	public var localURL: URL? = nil
 	
 	// Remote URL. If bundle URL is missing, this URL will be loaded.
-	var remoteURL: URL? = nil
+	public var remoteURL: URL? = nil
 	
-	var handlerName: String = DEFAULT_HANDLER_NAME
-	var scriptURL: URL = DEFAULT_SCRIPT_URL
+	public var handlerName: String = DEFAULT_HANDLER_NAME
+	public var scriptURL: URL = DEFAULT_SCRIPT_URL
 	
-	var url: URL? {
+	public var url: URL? {
 #if DEBUG
 		if let devURL = devURL {
 			return devURL
@@ -59,19 +61,19 @@ open class Bridge: NSObject {
     
     private var _loadDate = Date()
     
-    var debugLoggingEnabled = false
+    public var debugLoggingEnabled = false
 	
-	let webView: WKWebView
-	let configuration: BridgeConfiguration
+	public let webView: WKWebView
+	public let configuration: BridgeConfiguration
 	
-	weak var delegate: BridgeDelegate?
-	var middlewares: [BridgeMiddleware] = []
+	public weak var delegate: BridgeDelegate?
+	public var middlewares: [BridgeMiddleware] = []
 	
 	deinit {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: configuration.handlerName)
     }
     
-	init(webView: WKWebView, configuration: BridgeConfiguration) {
+	public init(webView: WKWebView, configuration: BridgeConfiguration) {
         self.configuration = configuration
         self.webView = webView
         
@@ -86,7 +88,7 @@ open class Bridge: NSObject {
         _setup()
     }
     
-	func dispatchToScript(_ message: Message) {
+	public func dispatchToScript(_ message: Message) {
 		for middleware in middlewares {
 			middleware.dispatchToScript(message)
 		}
@@ -95,7 +97,7 @@ open class Bridge: NSObject {
 		_callJavaScript(function: "window.CruxNativeAdapter.dispatchToScript", arguments: arguments)
     }
     
-	func reload() {
+	public func reload() {
 		_loadDate = Date()
 	
 #if DEBUG

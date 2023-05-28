@@ -1,15 +1,15 @@
 import Foundation
 
-extension Message {
+public extension Message {
 	var logLevel: LogLevel {
 		data?["log_level"] as? LogLevel ?? .debug
 	}
 }
 
-class LoggingMiddleware: BridgeMiddleware {
-	let level: LogLevel
+open class LoggingMiddleware: BridgeMiddleware {
+	public let level: LogLevel
 	
-	init(level: LogLevel? = nil) {
+	public init(level: LogLevel? = nil) {
 #if DEBUG
 		self.level = level ?? .debug
 #else
@@ -17,7 +17,7 @@ class LoggingMiddleware: BridgeMiddleware {
 #endif
 	}
 
-	func dispatchToNative(_ message: Message) {
+	public func dispatchToNative(_ message: Message) {
 		if message.type == .log {
 			_log(message.logLevel, message)
 		} else if message.type == .errorRaised {
@@ -27,7 +27,7 @@ class LoggingMiddleware: BridgeMiddleware {
 		}
 	}
 	
-	func dispatchToScript(_ message: Message) {
+	public func dispatchToScript(_ message: Message) {
 		if level.rawValue <= LogLevel.trace.rawValue {
 			_log(.trace, "[Native → Script]", message)
 		}

@@ -1,6 +1,6 @@
 import WebKit
 
-enum MessageType: String {
+public enum MessageType: String {
 	case pageLoaded
 	case pageLoadFailed
 	case errorRaised
@@ -12,24 +12,24 @@ enum MessageType: String {
 	case dismiss
 }
 
-struct Message {
-    let name: String
-    let data: [String: Any]?
+public struct Message {
+    public let name: String
+    public let data: [String: Any]?
     
     /// Milliseconds since unix epoch as provided by JavaScript Date.now().
-    var timestamp: TimeInterval {
+    public var timestamp: TimeInterval {
         data?["timestamp"] as? TimeInterval ?? 0
     }
     
-    var date: Date {
+    public var date: Date {
         Date(timeIntervalSince1970: timestamp / 1000.0)
     }
     
-    var type: MessageType? {
+    public var type: MessageType? {
 		return MessageType(rawValue: name)
 	}
 	
-	var jsonString: String? {
+	public var jsonString: String? {
 		guard let jsonData = try? JSONSerialization.data(withJSONObject: self.asDictionary(), options: [.sortedKeys]) else {
 			return nil
 		}
@@ -37,12 +37,12 @@ struct Message {
         return String(data: jsonData, encoding: .utf8)
 	}
 
-	init(name: String, data: [String: Any]? = nil) {
+	public init(name: String, data: [String: Any]? = nil) {
 		self.name = name
 		self.data = data
 	}
 	
-	init?(message: WKScriptMessage) {
+	public init?(message: WKScriptMessage) {
         guard let body = message.body as? [String: Any],
             let name = body["name"] as? String,
             let data = body["data"] as? [String: Any]
@@ -53,12 +53,11 @@ struct Message {
         self.init(name: name, data: data)
     }
 	
-	func asDictionary() -> [String: Any] {
+	public func asDictionary() -> [String: Any] {
 		var result: [String: Any] = ["name": self.name]
 		if let data = self.data {
 			result["data"] = data
 		}
 		return result
 	}
-	
 }

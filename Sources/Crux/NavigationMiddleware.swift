@@ -1,17 +1,17 @@
 import UIKit
 
-protocol Initializable {
+public protocol Initializable {
 	init(parameters: [String: Any])
 }
 
-class Router {
-	var routes: [String: UIViewController.Type] = [:]
+open class Router {
+	public var routes: [String: UIViewController.Type] = [:]
 
-	init(routes: [String: UIViewController.Type]) {
+	public init(routes: [String: UIViewController.Type]) {
 		self.routes = routes
 	}
 
-	func destination(for route: String, parameters: [String: Any]?) -> UIViewController? {
+	public func destination(for route: String, parameters: [String: Any]?) -> UIViewController? {
 		guard let type = routes[route] else {
 			return nil
 		}
@@ -28,27 +28,27 @@ class Router {
 }
 
 extension Message {
-	var destination: String? {
+	public var destination: String? {
 		return data?["destination"] as? String
 	}
 	
-	var animated: Bool {
+	public var animated: Bool {
 		return data?["animated"] as? Bool ?? true
 	}
 }
 
-class NavigationMiddleware: BridgeMiddleware {
-	var debugLoggingEnabled = false
+open class NavigationMiddleware: BridgeMiddleware {
+	public var debugLoggingEnabled = false
 
-	let viewController: UIViewController
-	let router: Router
+	public let viewController: UIViewController
+	public let router: Router
 
-	init(viewController: UIViewController, router: Router) {
+	public init(viewController: UIViewController, router: Router) {
 		self.viewController = viewController
 		self.router = router
 	}
 	
-	func dispatchToNative(_ message: Message) {
+	public func dispatchToNative(_ message: Message) {
 		switch message.type {
 		case .navigate:
 			_navigate(message)
@@ -65,7 +65,7 @@ class NavigationMiddleware: BridgeMiddleware {
 		}
 	}
 	
-	func dispatchToScript(_ message: Message) {
+	public func dispatchToScript(_ message: Message) {
 	}
 
 	private func _navigate(_ message: Message) {

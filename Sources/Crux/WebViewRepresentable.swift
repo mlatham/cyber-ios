@@ -2,11 +2,11 @@ import Foundation
 import SwiftUI
 import WebKit
 
-struct WebViewRepresentable: UIViewRepresentable {
-	let webView: WKWebView
-    let bridge: Bridge
+public struct WebViewRepresentable: UIViewRepresentable {
+	public let webView: WKWebView
+    public let bridge: Bridge
     
-    init(configuration: BridgeConfiguration, webViewConfiguration: WKWebViewConfiguration? = nil) {
+    public init(configuration: BridgeConfiguration, webViewConfiguration: WKWebViewConfiguration? = nil) {
 		let webViewConfiguration = webViewConfiguration ?? {
 			let configuration = WKWebViewConfiguration()
 			configuration.preferences.isTextInteractionEnabled = false
@@ -17,37 +17,37 @@ struct WebViewRepresentable: UIViewRepresentable {
 		bridge = Bridge(webView: webView, configuration: configuration)
 	}
     
-    func makeUIView(context: Context) -> WKWebView  {
+    public func makeUIView(context: Context) -> WKWebView  {
         return self.webView
     }
     
-    func updateUIView(_ uiView: WKWebView, context: Context) {
+    public func updateUIView(_ uiView: WKWebView, context: Context) {
     }
     
-    func dispatchToScript(_ message: Message) {
+    public func dispatchToScript(_ message: Message) {
 		self.bridge.dispatchToScript(message)
     }
 }
 
-struct WebViewControllerRepresentable: UIViewControllerRepresentable {
-	typealias UIViewControllerType = WebViewController
+public struct WebViewControllerRepresentable: UIViewControllerRepresentable {
+	public typealias UIViewControllerType = WebViewController
 	
-	let webViewController: WebViewController
+	public let webViewController: WebViewController
 	
-	init(configuration: BridgeConfiguration, webViewConfiguration: WKWebViewConfiguration? = nil) {
+	public init(configuration: BridgeConfiguration, webViewConfiguration: WKWebViewConfiguration? = nil) {
 		webViewController = WebViewController(
 			configuration: configuration,
 			webViewConfiguration: webViewConfiguration)
 	}
 	
-	func makeUIViewController(context: Context) -> WebViewController {
+	public func makeUIViewController(context: Context) -> WebViewController {
 		return webViewController
 	}
 	
-	func updateUIViewController(_ uiViewController: WebViewController, context: Context) {
+	public func updateUIViewController(_ uiViewController: WebViewController, context: Context) {
 	}
 	
-    func dispatchToScript(_ message: Message) {
+    public func dispatchToScript(_ message: Message) {
 		self.webViewController.dispatchToScript(message)
     }
 }
