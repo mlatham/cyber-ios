@@ -56,8 +56,8 @@ public struct BridgeConfiguration {
 		devURL: URL? = nil,
 		localURL: URL? = nil,
 		remoteURL: URL? = nil,
-		handlerName: String,
-		scriptURL: URL) {
+		handlerName: String = DEFAULT_HANDLER_NAME,
+		scriptURL: URL = DEFAULT_SCRIPT_URL) {
 		self.devURL = devURL
 		self.localURL = localURL
 		self.remoteURL = remoteURL
