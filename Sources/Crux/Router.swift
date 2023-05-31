@@ -43,12 +43,12 @@ public class WebViewRoute: GenericRoute<WebViewController>, RecyclableRoute {
 				webViewConfiguration: self.webViewConfiguration)
 		})
 	
-	let webViewConfiguration: WKWebViewConfiguration?
-	let remoteURL: URL?
-	let localURL: URL?
-	let devURL: URL?
+	public let webViewConfiguration: WKWebViewConfiguration?
+	public let remoteURL: URL?
+	public let localURL: URL?
+	public let devURL: URL?
 	
-	init(
+	public init(
 		key: String,
 		webViewConfiguration: WKWebViewConfiguration?,
 		remoteURL: URL? = nil,
