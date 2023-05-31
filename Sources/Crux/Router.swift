@@ -21,7 +21,7 @@ public class GenericRoute<T> where T : UIViewController {
 		self.key = key
 	}
 	
-	public func controller(initialState: [String: Any]?) -> T? {
+	public func controller(initialState: [String: Any]? = nil) -> T? {
 		let result = T.init()
 		if let state = initialState, let result = result as? Stateful {
 			result.setState(state)
@@ -62,7 +62,7 @@ public class WebViewRoute: GenericRoute<WebViewController>, RecyclableRoute {
 		super.init(key: key)
 	}
 	
-	public func controller(initialState: [String: Any]?) -> UIViewController? {
+	public func controller(initialState: [String: Any]? = nil) -> UIViewController? {
 		let result = _pool.dequeueInstance()
 		if let state = initialState, let result = result as? Stateful {
 			result.setState(state)
@@ -88,7 +88,7 @@ open class Router {
 		self.routes = routesDictionary
 	}
 	
-	public func controller(for key: String, initialState: [String: Any]?) -> UIViewController? {
+	public func controller(for key: String, initialState: [String: Any]? = nil) -> UIViewController? {
 		guard let route = routes[key] else {
 			return nil
 		}
