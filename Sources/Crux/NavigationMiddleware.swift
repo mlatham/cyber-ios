@@ -1,31 +1,5 @@
 import UIKit
-
-public protocol Initializable {
-	init(parameters: [String: Any])
-}
-
-open class Router {
-	public var routes: [String: UIViewController.Type] = [:]
-
-	public init(routes: [String: UIViewController.Type]) {
-		self.routes = routes
-	}
-
-	public func destination(for route: String, parameters: [String: Any]?) -> UIViewController? {
-		guard let type = routes[route] else {
-			return nil
-		}
-		
-		if let initializableType = type as? Initializable.Type {
-			// Pass parameters if this is initializable.
-			return initializableType.init(parameters: parameters ?? [:]) as? UIViewController
-			
-		} else {
-			// Initialize without parameters.
-			return type.init()
-		}
-	}
-}
+import WebKit
 
 extension Message {
 	public var destination: String? {
@@ -71,7 +45,7 @@ open class NavigationMiddleware: BridgeMiddleware {
 	private func _navigate(_ message: Message) {
 		guard let route = message.destination,
 			let navigationController = viewController.navigationController,
-			let destinationController = router.destination(for: route, parameters: message.data) else {
+			let destinationController = router.controller(for: route, initialState: message.data) else {
 			return
 		}
 		
@@ -96,7 +70,7 @@ open class NavigationMiddleware: BridgeMiddleware {
 	
 	private func _present(_ message: Message) {
 		guard let route = message.destination,
-			let destinationController = router.destination(for: route, parameters: message.data) else {
+			let destinationController = router.controller(for: route, initialState: message.data) else {
 			return
 		}
 	

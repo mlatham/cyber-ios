@@ -4,12 +4,12 @@ open class InstancePool<T> {
 	private var _instances: [T] = []
 	
 	private var _create: () -> T
-	private var _recycle: (T) -> Void
+	private var _recycle: ((T) -> Void)?
 	
 	public init(
 		_ initialCount: Int,
 		create: @escaping () -> T,
-		recycle: @escaping (T) -> Void) {
+		recycle: ((T) -> Void)? = nil) {
 		_create = create
 		_recycle = recycle
 		
@@ -30,7 +30,7 @@ open class InstancePool<T> {
 	}
 	
 	public func recycleInstance(_ instance: T) {
-		_recycle(instance)
+		_recycle?(instance)
 		_instances.append(instance)
 	}
 }
