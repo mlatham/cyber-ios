@@ -50,7 +50,7 @@ public class WebViewRoute: GenericRoute<WebViewController>, RecyclableRoute {
 	
 	public init(
 		key: String,
-		webViewConfiguration: WKWebViewConfiguration?,
+		webViewConfiguration: WKWebViewConfiguration? = nil,
 		remoteURL: URL? = nil,
 		localURL: URL? = nil,
 		devURL: URL? = nil) {
