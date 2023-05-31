@@ -6,6 +6,11 @@ public struct WebViewRepresentable: UIViewRepresentable {
 	public let webView: WKWebView
     public let bridge: Bridge
     
+    public init(configuration: BridgeConfiguration, webView: WKWebView) {
+		self.webView = webView
+		self.bridge = Bridge(webView: webView, configuration: configuration)
+	}
+    
     public init(configuration: BridgeConfiguration, webViewConfiguration: WKWebViewConfiguration? = nil) {
 		let webViewConfiguration = webViewConfiguration ?? {
 			let configuration = WKWebViewConfiguration()
@@ -13,8 +18,9 @@ public struct WebViewRepresentable: UIViewRepresentable {
 			return configuration
 		}()
 		
-		webView = WKWebView(frame: .zero, configuration: webViewConfiguration)
-		bridge = Bridge(webView: webView, configuration: configuration)
+		self.init(
+			configuration: configuration,
+			webView: WKWebView(frame: .zero, configuration: webViewConfiguration))
 	}
     
     public func makeUIView(context: Context) -> WKWebView  {
@@ -34,8 +40,12 @@ public struct WebViewControllerRepresentable: UIViewControllerRepresentable {
 	
 	public let webViewController: WebViewController
 	
+	public init(webViewController: WebViewController) {
+		self.webViewController = webViewController
+	}
+	
 	public init(configuration: BridgeConfiguration, webViewConfiguration: WKWebViewConfiguration? = nil) {
-		webViewController = WebViewController(
+		self.webViewController = WebViewController(
 			configuration: configuration,
 			webViewConfiguration: webViewConfiguration)
 	}
