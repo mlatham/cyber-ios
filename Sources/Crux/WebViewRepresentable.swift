@@ -61,3 +61,20 @@ public struct WebViewControllerRepresentable: UIViewControllerRepresentable {
 		self.webViewController.dispatchToScript(message)
     }
 }
+
+public struct ViewControllerRepresentable<T>: UIViewControllerRepresentable where T: UIViewController {
+	public typealias UIViewControllerType = T
+
+	public let controller: T
+	
+	public init(controller: T) {
+		self.controller = controller
+	}
+	
+	public func makeUIViewController(context: Context) -> T {
+		return controller
+	}
+	
+	public func updateUIViewController(_ uiViewController: T, context: Context) {
+	}
+}
