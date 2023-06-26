@@ -1,12 +1,12 @@
 (() => {
 class iOSNativeAdapter {
 	constructor() {
-		this.messageHandler = webkit.messageHandlers.crux
+		this.messageHandler = webkit.messageHandlers.Cyber
 	}
 
     setAdapter() {
-		if (window.Crux) {
-			window.Crux.nativeAdapter = this
+		if (window.Cyber) {
+			window.Cyber.nativeAdapter = this
 		} else {
 			throw new Error("Failed to register the iOSNativeAdapter")
 		}
@@ -18,7 +18,7 @@ class iOSNativeAdapter {
 	}
 	
     dispatchToScript(name, data = {}) {
-		window.Crux.dispatchToScript(name, data)
+		window.Cyber.dispatchToScript(name, data)
 	}
 
 	pageLoaded() {
@@ -36,31 +36,31 @@ class iOSNativeAdapter {
 
 addEventListener("error", event => {
 	const error = event.message + " (" + event.filename + ":" + event.lineno + ":" + event.colno + ")"
-	window.CruxNativeAdapter.errorRaised(error)
+	window.CyberNativeAdapter.errorRaised(error)
 }, false)
 
-window.CruxNativeAdapter = new iOSNativeAdapter()
+window.CyberNativeAdapter = new iOSNativeAdapter()
 
 const setup = function() {
-	window.CruxNativeAdapter.setAdapter()
-	window.CruxNativeAdapter.pageLoaded()
+	window.CyberNativeAdapter.setAdapter()
+	window.CyberNativeAdapter.pageLoaded()
 
-	document.removeEventListener("crux:load", setup)
+	document.removeEventListener("Cyber:load", setup)
 }
 
 const setupOnLoad = () => {
-	const CRUX_LOAD_TIMEOUT = 2000
+	const Cyber_LOAD_TIMEOUT = 2000
 
-	document.addEventListener("crux:load", setup)
+	document.addEventListener("Cyber:load", setup)
 
 	setTimeout(() => {
-		if (!window.Crux) {
-			window.CruxNativeAdapter.pageLoadFailed()
+		if (!window.Cyber) {
+			window.CyberNativeAdapter.pageLoadFailed()
 		}
-	}, CRUX_LOAD_TIMEOUT)
+	}, Cyber_LOAD_TIMEOUT)
 }
 
-if (window.Crux) {
+if (window.Cyber) {
 	setup()
 } else {
 	setupOnLoad()

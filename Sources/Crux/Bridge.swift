@@ -20,7 +20,7 @@ public struct BridgeConfiguration {
         #endif
     }
     
-	public static let DEFAULT_HANDLER_NAME = "crux"
+	public static let DEFAULT_HANDLER_NAME = "Cyber"
 	public static let DEFAULT_SCRIPT_URL = _bundle.url(
 		forResource: "ios-native-adapter",
 		withExtension: "js")!
@@ -107,7 +107,7 @@ open class Bridge: NSObject {
 		}
 	
 		let arguments: [Any?] = message.data != nil ? [message.name, message.data] : [message.name]
-		_callJavaScript(function: "window.CruxNativeAdapter.dispatchToScript", arguments: arguments)
+		_callJavaScript(function: "window.CyberNativeAdapter.dispatchToScript", arguments: arguments)
     }
     
 	public func reload() {

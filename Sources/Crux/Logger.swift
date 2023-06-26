@@ -32,7 +32,7 @@ public enum LogLevel: Int, CustomStringConvertible {
 }
 
 public class Logger {
-	private static let _logger = os.Logger(subsystem: Bundle.main.bundleIdentifier!, category: "crux")
+	private static let _logger = os.Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Cyber")
 	
 	public static func log(_ level: LogLevel, _ message: String) {
 		_logger.log(level: level.osLogLevel, "\(message)")

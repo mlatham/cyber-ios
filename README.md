@@ -1,3 +1,3 @@
-# Crux-iOS
+# Cyber-iOS
 
 A description of this package.
