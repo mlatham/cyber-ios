@@ -76,14 +76,14 @@ open class Bridge: NSObject {
     
     public var debugLoggingEnabled = false
 	
-	public let webView: WKWebView
+	public weak var webView: WKWebView?
 	public let configuration: BridgeConfiguration
 	
 	public weak var delegate: BridgeDelegate?
 	public var middlewares: [BridgeMiddleware] = []
 	
 	deinit {
-        webView.configuration.userContentController.removeScriptMessageHandler(forName: configuration.handlerName)
+        webView?.configuration.userContentController.removeScriptMessageHandler(forName: configuration.handlerName)
     }
     
 	public init(webView: WKWebView, configuration: BridgeConfiguration) {
@@ -92,7 +92,7 @@ open class Bridge: NSObject {
         
 #if DEBUG
 		if #available(iOS 16.4, *) {
-			self.webView.isInspectable = true
+			self.webView?.isInspectable = true
 		}
 #endif
         
@@ -116,17 +116,17 @@ open class Bridge: NSObject {
 #if DEBUG
 		if let devURL = self.configuration.devURL {
 			let request = URLRequest(url: devURL)
-			webView.load(request)
+			webView?.load(request)
 			return
 		}
 #endif
 		if let localURL = self.configuration.localURL {
-			webView.loadFileURL(localURL, allowingReadAccessTo: localURL)
+			webView?.loadFileURL(localURL, allowingReadAccessTo: localURL)
 			let request = URLRequest(url: localURL)
-			webView.load(request)
+			webView?.load(request)
 		} else if let remoteURL = self.configuration.remoteURL {
 			let request = URLRequest(url: remoteURL)
-			webView.load(request)
+			webView?.load(request)
 		}
 	}
 }
@@ -158,9 +158,9 @@ extension Bridge: WKScriptMessageHandler {
 
 private extension Bridge {
 	func _setup() {
-        webView.configuration.userContentController.addUserScript(_userScript)
-        webView.configuration.userContentController.add(self, name: configuration.handlerName)
-        webView.navigationDelegate = self
+        webView?.configuration.userContentController.addUserScript(_userScript)
+        webView?.configuration.userContentController.add(self, name: configuration.handlerName)
+        webView?.navigationDelegate = self
         
         reload()
     }
@@ -176,7 +176,7 @@ private extension Bridge {
         let debug = debugLoggingEnabled
         Logger.logIf(debug, .trace, "[Native → Script] \(expression.string ?? "")")
 
-        webView.evaluateJavaScript(script, in: nil, in: .page) { result in
+        webView?.evaluateJavaScript(script, in: nil, in: .page) { result in
             Logger.logIf(debug, .trace, "[Native → Script] evaluation complete:\n\(expression.string ?? "")")
             
             switch result {

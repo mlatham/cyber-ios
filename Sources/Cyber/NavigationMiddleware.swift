@@ -15,11 +15,11 @@ open class NavigationMiddleware: BridgeMiddleware {
 	public var debugLoggingEnabled = false
 
 	public let viewController: UIViewController
-	public let router: Router
+	public let pool: WebViewControllerPool
 
-	public init(viewController: UIViewController, router: Router) {
+	public init(viewController: UIViewController, pool: WebViewControllerPool) {
 		self.viewController = viewController
-		self.router = router
+		self.pool = pool
 	}
 	
 	public func dispatchToNative(_ message: Message) {
@@ -45,7 +45,7 @@ open class NavigationMiddleware: BridgeMiddleware {
 	private func _navigate(_ message: Message) {
 		guard let route = message.destination,
 			let navigationController = viewController.navigationController,
-			let destinationController = router.controller(for: route, initialState: message.data) else {
+			let destinationController = pool.dequeueInstance(for: route, initialState: message.data) else {
 			return
 		}
 		
@@ -70,7 +70,7 @@ open class NavigationMiddleware: BridgeMiddleware {
 	
 	private func _present(_ message: Message) {
 		guard let route = message.destination,
-			let destinationController = router.controller(for: route, initialState: message.data) else {
+			let destinationController = pool.dequeueInstance(for: route, initialState: message.data) else {
 			return
 		}
 	

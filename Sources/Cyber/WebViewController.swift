@@ -2,18 +2,15 @@ import Foundation
 import WebKit
 
 open class WebViewController: UIViewController {
-	public let webView: WKWebView
-	public let bridge: Bridge
+	public let webView: WebView
 
-	public init(configuration: BridgeConfiguration, webViewConfiguration: WKWebViewConfiguration? = nil) {
-		let webViewConfiguration = webViewConfiguration ?? {
-			let configuration = WKWebViewConfiguration()
-			configuration.preferences.isTextInteractionEnabled = false
-			return configuration
-		}()
-	
-		webView = WKWebView(frame: .zero, configuration: webViewConfiguration)
-		bridge = Bridge(webView: webView, configuration: configuration)
+	public init(
+		bridgeConfig: BridgeConfiguration,
+		webViewConfig: WKWebViewConfiguration? = nil) {
+		webView = WebView(
+			frame: .zero,
+			bridgeConfig: bridgeConfig,
+			webViewConfig: webViewConfig)
 		
 		super.init(nibName: nil, bundle: nil)
 	}
@@ -40,6 +37,6 @@ open class WebViewController: UIViewController {
 	}
 	
 	public func dispatchToScript(_ message: Message) {
-		self.bridge.dispatchToScript(message)
+		webView.dispatchToScript(message)
     }
 }
