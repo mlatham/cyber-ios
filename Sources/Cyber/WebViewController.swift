@@ -2,13 +2,29 @@ import Foundation
 import WebKit
 
 open class WebViewController: UIViewController {
+
+	// MARK: - Properties
+
 	public let webView: WebView
+	
+	public var bridge: Bridge {
+		return webView.bridge
+	}
+	
+	public weak var delegate: BridgeDelegate? {
+		get { return bridge.delegate }
+		set { bridge.delegate = newValue }
+	}
+	
+	
+	// MARK: - Inits
 
 	public init(
-		bridgeConfig: BridgeConfiguration,
+		route: String,
+		bridgeConfig: BridgeConfig = BridgeConfig.default!,
 		webViewConfig: WKWebViewConfiguration? = nil) {
 		webView = WebView(
-			frame: .zero,
+			route: route,
 			bridgeConfig: bridgeConfig,
 			webViewConfig: webViewConfig)
 		
@@ -18,6 +34,9 @@ open class WebViewController: UIViewController {
 	public required init?(coder: NSCoder) {
 		fatalError("Not supported")
 	}
+	
+	
+	// MARK: - Functions
 	
 	public override func viewDidLoad() {
 		super.viewDidLoad()
@@ -34,6 +53,10 @@ open class WebViewController: UIViewController {
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
+	}
+	
+	public func load(route: String) {
+		webView.load(route: route)
 	}
 	
 	public func dispatchToScript(_ message: Message) {

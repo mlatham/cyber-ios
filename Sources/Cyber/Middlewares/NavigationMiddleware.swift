@@ -12,15 +12,24 @@ extension Message {
 }
 
 open class NavigationMiddleware: BridgeMiddleware {
+
+	// MARK: - Properties
+
 	public var debugLoggingEnabled = false
 
 	public let viewController: UIViewController
 	public let pool: WebViewControllerPool
 
+
+	// MARK: - Inits
+
 	public init(viewController: UIViewController, pool: WebViewControllerPool) {
 		self.viewController = viewController
 		self.pool = pool
 	}
+	
+
+	// MARK: - Functions
 	
 	public func dispatchToNative(_ message: Message) {
 		switch message.type {

@@ -7,7 +7,13 @@ public extension Message {
 }
 
 open class LoggingMiddleware: BridgeMiddleware {
+
+	// MARK: - Properties
+
 	public let level: LogLevel
+	
+	
+	// MARK: - Inits
 	
 	public init(level: LogLevel? = nil) {
 #if DEBUG
@@ -16,6 +22,9 @@ open class LoggingMiddleware: BridgeMiddleware {
 		self.level = level ?? .error
 #endif
 	}
+	
+	
+	// MARK: - Functions
 
 	public func dispatchToNative(_ message: Message) {
 		if message.type == .log {

@@ -13,6 +13,9 @@ public enum MessageType: String {
 }
 
 public struct Message {
+
+	// MARK: - Properties
+
     public let name: String
     public let data: [String: Any]?
     
@@ -37,6 +40,9 @@ public struct Message {
         return String(data: jsonData, encoding: .utf8)
 	}
 
+
+	// MARK: - Inits
+
 	public init(name: String, data: [String: Any]? = nil) {
 		self.name = name
 		self.data = data
@@ -52,6 +58,9 @@ public struct Message {
         
         self.init(name: name, data: data)
     }
+	
+	
+	// MARK: - Functions
 	
 	public func asDictionary() -> [String: Any] {
 		var result: [String: Any] = ["name": self.name]

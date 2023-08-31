@@ -1,10 +1,16 @@
 import Foundation
 
 open class InstancePool<T> {
+
+	// MARK: - Properties
+
 	private var _instances: [T] = []
 	
 	private var _create: () -> T
 	private var _recycle: ((T) -> Void)?
+	
+	
+	// MARK: - Inits
 	
 	public init(
 		_ initialCount: Int,
@@ -21,6 +27,9 @@ open class InstancePool<T> {
 			}
 		}
 	}
+	
+	
+	// MARK: - Functions
 	
 	public func dequeueInstance() -> T {
 		if _instances.count > 0 {
