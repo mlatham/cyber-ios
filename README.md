@@ -14,15 +14,15 @@ Add the `dist` folder into the bundle. Make sure you select "Create folder refer
 import Cyber
 
 // Configures where to find html content.
-let config = BridgeConfiguration(
+let config = BridgeConfig(
 	routes: [ "*" ],
-	localBaseURL: "dist")
+	subdirectory: "dist")
 
 // Creates middleware.
 config.middlewares.add(NavigationMiddleware(config))
 config.middlewares.add(LoggingMiddleware())
 
-BridgeConfiguration.defaultConfiguration = config
+BridgeConfig.default = config
 
 let webViewController = WebViewController("index")
 webViewController.dispatch(Message(name: "navigate", data: ["to": "profile"])
@@ -33,27 +33,27 @@ webViewController.dispatch(Message(name: "navigate", data: ["to": "profile"])
 Explicit routes:
 
 ```
-let config = BridgeConfiguration(
+let config = BridgeConfig(
 	routes: [
 		"profile",
 		"discover",
 		"settings"
 	],
-	localBaseURL: "dist")
+	subdirectory: "dist")
 ```
 
 Route for each .html file in the embedded `dist` folder:
 
 ```
-let config = BridgeCpnfiguration(
+let config = BridgeConfig(
 	routes: [ "*" ],
-	localBaseURL: "dist")
+	subdirectory: "dist")
 ```
 
 Route for each file matching a glob pattern in the embedded `dist` folder:
 
 ```
-let config = BridgeCpnfiguration(
+let config = BridgeConfig(
 	routes: [ "*.html" ],
-	localBaseURL: "dist")
+	subdirectory: "dist")
 ```

@@ -11,21 +11,40 @@ extension Message {
 	}
 }
 
+extension UIApplication {
+	var keyWindow: UIWindow? {
+		// Get connected scenes.
+		return self.connectedScenes
+			// Keep only active scenes, onscreen and visible to the user.
+			.filter { $0.activationState == .foregroundActive }
+			// Keep only the first `UIWindowScene`.
+			.first(where: { $0 is UIWindowScene })
+			// Get its associated windows.
+			.flatMap({ $0 as? UIWindowScene })?.windows
+			// Finally, keep only the key window.
+			.first(where: \.isKeyWindow)
+	}
+}
+
 open class NavigationMiddleware: BridgeMiddleware {
 
 	// MARK: - Properties
 
 	public var debugLoggingEnabled = false
 
-	public let viewController: UIViewController
 	public let pool: WebViewControllerPool
+	public let viewController: UIViewController?
+
+	var currentViewController: UIViewController? {
+		return viewController ?? UIApplication.shared.keyWindow?.rootViewController
+	}
 
 
 	// MARK: - Inits
 
-	public init(viewController: UIViewController, pool: WebViewControllerPool) {
+	public init(config: BridgeConfig, viewController: UIViewController? = nil) {
+		self.pool = WebViewControllerPool(config: config)
 		self.viewController = viewController
-		self.pool = pool
 	}
 	
 
@@ -53,7 +72,7 @@ open class NavigationMiddleware: BridgeMiddleware {
 
 	private func _navigate(_ message: Message) {
 		guard let route = message.destination,
-			let navigationController = viewController.navigationController,
+			let navigationController = currentViewController?.navigationController,
 			let destinationController = pool.dequeueInstance(for: route, initialState: message.data) else {
 			return
 		}
@@ -62,7 +81,7 @@ open class NavigationMiddleware: BridgeMiddleware {
 	}
 	
 	private func _navigateBack(_ message: Message) {
-		guard let navigationController = viewController.navigationController else {
+		guard let navigationController = currentViewController?.navigationController else {
 			return
 		}
 	
@@ -70,7 +89,7 @@ open class NavigationMiddleware: BridgeMiddleware {
 	}
 	
 	private func _navigateBackToRoot(_ message: Message) {
-		guard let navigationController = viewController.navigationController else {
+		guard let navigationController = currentViewController?.navigationController else {
 			return
 		}
 	
@@ -83,10 +102,10 @@ open class NavigationMiddleware: BridgeMiddleware {
 			return
 		}
 	
-		viewController.present(destinationController, animated: message.animated)
+		currentViewController?.present(destinationController, animated: message.animated)
 	}
 	
 	private func _dismiss(_ message: Message) {
-		viewController.dismiss(animated: message.animated)
+		currentViewController?.dismiss(animated: message.animated)
 	}
 }
