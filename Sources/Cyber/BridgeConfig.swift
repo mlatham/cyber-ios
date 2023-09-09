@@ -51,6 +51,8 @@ public struct BridgeConfig {
 		return localBaseURL
 	}
 	
+	public var middlewares: [BridgeMiddleware] = []
+	
 	
 	// MARK: - Inits
 	

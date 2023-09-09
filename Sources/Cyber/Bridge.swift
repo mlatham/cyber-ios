@@ -24,7 +24,6 @@ open class Bridge: NSObject {
 	public var route: String
 	
 	public weak var delegate: BridgeDelegate?
-	public var middlewares: [BridgeMiddleware] = []
 	
 	
 	// MARK: - Inits
@@ -60,7 +59,7 @@ open class Bridge: NSObject {
     // MARK: - Functions
     
 	public func dispatchToScript(_ message: Message) {
-		for middleware in middlewares {
+		for middleware in config.middlewares {
 			middleware.dispatchToScript(message)
 		}
 	
@@ -105,7 +104,7 @@ extension Bridge: WKScriptMessageHandler {
 		switch (message.name) {
 		case config.handlerName:
 			if let scriptMessage = Message(message: message) {
-				for middleware in middlewares {
+				for middleware in config.middlewares {
 					middleware.dispatchToNative(scriptMessage)
 				}
 				
