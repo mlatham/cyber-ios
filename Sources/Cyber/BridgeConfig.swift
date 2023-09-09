@@ -21,9 +21,17 @@ public struct BridgeConfig {
 		withExtension: "js")!
 
 	/// Config used when none is provided to WebView and WebViewController.
-    public static var `default` = try? BridgeConfig(
-		routes: ["*"],
-		subdirectory: "dist")
+    public static var `default` = {
+		var config = try? BridgeConfig(
+			routes: ["*"],
+			subdirectory: "dist")
+		
+		// Creates middleware.
+		config.middlewares.append(NavigationMiddleware(config: config))
+		config.middlewares.append(LoggingMiddleware(level: .all))
+		
+		return config
+	}()
 
 	/// WebView configuration blocks. Use these to override WKWebView default configurations per route.
 	private let _routesToWebViewConfigs: [String: WKWebViewConfiguration]
