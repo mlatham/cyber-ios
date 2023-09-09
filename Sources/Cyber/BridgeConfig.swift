@@ -129,7 +129,7 @@ private extension BridgeConfig {
 	
 	/// Returns all routes based on this configuration. If routes is ["*"], returns one route for each .html file in `localBaseURL`.
 	static func _resolveRoutes(_ routes: [String], baseURL: URL) throws -> [String] {
-		guard routes != ["*"] else {
+		guard routes == ["*"] else {
 			return routes
 		}
 			
