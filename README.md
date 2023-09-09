@@ -33,7 +33,7 @@ webViewController.dispatch(Message(name: "navigate", data: ["to": "profile"])
 Explicit routes:
 
 ```
-let config = BridgeCpnfiguration(
+let config = BridgeConfiguration(
 	routes: [
 		"profile",
 		"discover",
