@@ -75,7 +75,7 @@ open class Bridge: NSObject {
 	public func reload() {
 		_reloadStartDate = Date()
 		
-		guard let url = self.config.localURL(for: route) else {
+		guard let url = self.config.url(for: route) else {
 			Logger.log(.error, "\(self.route): Not found")
 			return
 		}

@@ -14,8 +14,8 @@ open class WebViewPool {
 	public init(config: BridgeConfig = BridgeConfig.default) {
 		var routesDictionary: [String: WebViewRoute] = [:]
 		for route in config.routes {
-			routesDictionary[route] = WebViewRoute(
-				route: route,
+			routesDictionary[route.routeKey] = WebViewRoute(
+				route: route.route,
 				config: config)
 		}
 		self.routes = routesDictionary
@@ -26,11 +26,11 @@ open class WebViewPool {
 	// MARK: - Functions
 	
 	func webViewConfig(for route: String) -> WKWebViewConfiguration? {
-		return config.webViewConfig(for: route)
+		return config.webViewConfig(for: Route.key(for: route))
 	}
 	
 	func dequeueInstance(for route: String, initialState: [String: Any]? = nil) -> WebView? {
-		guard let route = routes[route] else {
+		guard let route = routes[Route.key(for: route)] else {
 			return nil
 		}
 		
@@ -38,6 +38,6 @@ open class WebViewPool {
 	}
 	
 	func recycleInstance(_ instance: WebView, for route: String) {
-		routes[route]?.recycleInstance(instance)
+		routes[Route.key(for: route)]?.recycleInstance(instance)
 	}
 }

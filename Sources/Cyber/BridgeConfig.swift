@@ -15,6 +15,7 @@ public struct BridgeConfig {
         #endif
     }
 
+	public static let DEFAULT_DEV_URL = URL(string: "http://localhost:8081")!
 	public static let DEFAULT_HANDLER_NAME = "Cyber"
 	public static let DEFAULT_SCRIPT_URL = _bundle.url(
 		forResource: "ios-native-adapter",
@@ -34,31 +35,22 @@ public struct BridgeConfig {
 	}()
 
 	/// WebView configuration blocks. Use these to override WKWebView default configurations per route.
-	private let _routesToWebViewConfigs: [String: WKWebViewConfiguration]
-	private var _routeURLs: [String: URL] = [:]
+	private let _routeKeysToWebViewConfigs: [String: WKWebViewConfiguration]
+	private var _routeKeysToRoutes: [String: Route] = [:]
 
 	public var handlerName: String = DEFAULT_HANDLER_NAME
 	public var scriptURL: URL = DEFAULT_SCRIPT_URL
 
 	/// Development URL, to load in DEBUG configurations, or nil to force only bundle loading.
-	public var devBaseURL: URL? = URL(string: "http://localhost:8081")
+	public let devBaseURL: URL
 
 	/// Local (bundle or documents) URL with read access to the .html file of each route.
-	public var localBaseURL: URL
+	public let localBaseURL: URL
 	
 	/// List of routes. If a wildcard route is provided, this includes the explicit routes that were expanded from the wildcard.
-	public let routes: [String]
+	public private(set) var routes: [Route] = []
 	
-	/// Base URL used for building routes.
-	public var baseURL: URL? {
-#if DEBUG
-		if let devBaseURL = devBaseURL {
-			return devBaseURL
-		}
-#endif
-		return localBaseURL
-	}
-	
+	/// WebViews and WebViewControllers initialized with this config will use these middlewares.
 	public var middlewares: [BridgeMiddleware] = []
 	
 	
@@ -67,6 +59,7 @@ public struct BridgeConfig {
 	public init(
 		routes: [String],
 		subdirectory: String,
+		devBaseURL: URL = DEFAULT_DEV_URL,
 		routesToWebViewConfigs: [String: WKWebViewConfiguration] = [:],
 		bundle: Bundle = Bundle.main) throws {
 		
@@ -78,103 +71,104 @@ public struct BridgeConfig {
 		
 		try self.init(
 			routes: routes,
-			localBaseURL: localBaseURL)
+			localBaseURL: localBaseURL,
+			devBaseURL: devBaseURL)
 	}
 	
 	public init(
 		routes: [String],
 		localBaseURL: URL,
+		devBaseURL: URL = DEFAULT_DEV_URL,
 		routesToWebViewConfigs: [String: WKWebViewConfiguration] = [:]) throws {
+		self.devBaseURL = devBaseURL
 		self.localBaseURL = localBaseURL
-		self._routesToWebViewConfigs = routesToWebViewConfigs
 		
+		// Convert route strings to route keys.
+		var routeKeysToWebViewConfigs: [String: WKWebViewConfiguration] = [:]
+		for route in routesToWebViewConfigs.keys {
+			routeKeysToWebViewConfigs[Route.key(for: route)] = routesToWebViewConfigs[route]
+		}
+		self._routeKeysToWebViewConfigs = routeKeysToWebViewConfigs
+		
+		// Load the routes.
+		try loadRoutes(routes)
+	}
+	
+	
+	// MARK: - Functions
+	
+	public mutating func loadRoutes(_ routes: [String]) throws {
 		if !FileManager.default.fileExists(atPath: localBaseURL.path) {
 			throw CyberError.runtimeError("BridgeConfig.localBaseURL '\(localBaseURL.path)' not found")
 		}
 		
 		// Load the routes, expanding wildcards if necessary.
 		do {
-			let routes = try BridgeConfig._resolveRoutes(routes, baseURL: localBaseURL)
+			let routes = try _resolveRoutes(routes)
 			self.routes = routes
 		} catch {
 			throw CyberError.runtimeError("BridgeConfig.routes failed to load/expand wildcards.\nError: \(error).")
 		}
 		
-		// Build a cache of each route URL.
+		// Build a cache of each route by its string.
 		for route in self.routes {
-			let routeDotHtml = BridgeConfig._addHtmlExtensionIfNeeded(route)
-			let routeURL = baseURL?.appendingPathComponent(routeDotHtml)
-			_routeURLs[routeDotHtml] = routeURL
+			_routeKeysToRoutes[route.routeKey] = route
 		}
 		
-		let invalidRoutes = BridgeConfig._invalidRoutes(routeURLs: Array(_routeURLs.values))
+		let invalidRoutes = self.routes.filter { !$0.localURLExists }.compactMap { $0.localURL }
 		if !invalidRoutes.isEmpty {
-			throw CyberError.runtimeError("Routes invalid: \(invalidRoutes)")
+			throw CyberError.runtimeError("Local routes missing: \(invalidRoutes)")
 		}
 	}
 	
-	
-	// MARK: - Functions
-	
 	func webViewConfig(for route: String) -> WKWebViewConfiguration? {
-		let routeDotHtml = BridgeConfig._addHtmlExtensionIfNeeded(route)
-		return _routesToWebViewConfigs[routeDotHtml]
+		return _routeKeysToWebViewConfigs[Route.key(for: route)]
 	}
 	
-	func localURL(for route: String) -> URL? {
-		return _routeURLs[BridgeConfig._addHtmlExtensionIfNeeded(route)]
+	func url(for route: String) -> URL? {
+		let route = _routeKeysToRoutes[Route.key(for: route)]
+		return route?.envURL // Local or dev URL based on build type.
 	}
 }
 
 private extension BridgeConfig {
-	/// Ensures routes have an .html suffix.
-	static func _addHtmlExtensionIfNeeded(_ route: String) -> String {
-		if !route.hasSuffix(".html") {
-			return route.appending(".html")
-		}
-		return route
-	}
-	
 	/// Returns all routes based on this configuration. If routes is ["*"], returns one route for each .html file in `localBaseURL`.
-	static func _resolveRoutes(_ routes: [String], baseURL: URL) throws -> [String] {
-		guard routes == ["*"] else {
-			return routes
+	func _resolveRoutes(_ routes: [String]) throws -> [Route] {
+		var routes = routes
+		if routes == ["*"] {
+			var directoryFilenames: [String] = []
+			var expandedRoutes: [String] = []
+			
+			// Load the routes available from the bundle.
+			if #available(iOS 16.0, *) {
+				directoryFilenames = try FileManager.default.contentsOfDirectory(
+					atPath: localBaseURL.path(percentEncoded: false))
+			} else {
+				directoryFilenames = try FileManager.default.contentsOfDirectory(
+					atPath: localBaseURL.path)
+			}
+			
+			// Only pick up .html files.
+			for filename in directoryFilenames {
+				if filename.hasSuffix(".html") {
+					expandedRoutes.append(filename)
+				}
+			}
+			
+			// Overwrite the routes array with the expanded routes.
+			routes = expandedRoutes
+		}
+		
+		// Convert to route objects.
+		var routeWrappers: [Route] = []
+		for route in routes {
+			routeWrappers.append(Route(
+				route: route,
+				localBaseURL: localBaseURL,
+				devBaseURL: devBaseURL))
 		}
 			
-		var directoryFilenames: [String] = []
-		var expandedRoutes: [String] = []
-		
-		// Load the routes available from the bundle.
-		if #available(iOS 16.0, *) {
-			directoryFilenames = try FileManager.default.contentsOfDirectory(
-				atPath: baseURL.path(percentEncoded: false))
-		} else {
-			directoryFilenames = try FileManager.default.contentsOfDirectory(
-				atPath: baseURL.path)
-		}
-		
-		// Only pick up .html files.
-		for filename in directoryFilenames {
-			if filename.hasSuffix(".html") {
-				expandedRoutes.append(filename)
-			}
-		}
-		
-		// Use the expanded routes.
-		return expandedRoutes
-	}
-	
-	/// Returns an array of any routes that aren't present in the bundle.
-	static func _invalidRoutes(routeURLs: [URL]) -> [String] {
-		var invalidRoutes = [String]()
-	
-		for routeURL in routeURLs {
-			// Check that each route's path exists in the bundle.
-			if !FileManager.default.fileExists(atPath: routeURL.path) {
-				invalidRoutes.append(routeURL.path)
-			}
-		}
-		
-		return invalidRoutes
+		// Use the route wrappers.
+		return routeWrappers
 	}
 }
