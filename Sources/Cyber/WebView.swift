@@ -26,7 +26,7 @@ open class WebView: WKWebView {
 	
 	public init(
 		route: String,
-		bridgeConfig: BridgeConfig = BridgeConfig.default!,
+		bridgeConfig: BridgeConfig = BridgeConfig.default,
 		webViewConfig: WKWebViewConfiguration? = nil,
 		frame: CGRect = CGRect.zero) {
 		let webViewConfig = webViewConfig

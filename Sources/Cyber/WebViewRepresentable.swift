@@ -26,7 +26,7 @@ public struct WebViewRepresentable: UIViewRepresentable {
     
     public init(
 		route: String,
-		bridgeConfig: BridgeConfig = BridgeConfig.default!,
+		bridgeConfig: BridgeConfig = BridgeConfig.default,
 		webViewConfig: WKWebViewConfiguration? = nil) {
 		self.webView = WebView(
 			route: route,

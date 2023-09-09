@@ -11,7 +11,7 @@ open class WebViewControllerPool {
 
 	// MARK: - Inits
 
-	public init(config: BridgeConfig = BridgeConfig.default!) {
+	public init(config: BridgeConfig = BridgeConfig.default) {
 		var routesDictionary: [String: WebViewControllerRoute] = [:]
 		for route in config.routes {
 			routesDictionary[route] = WebViewControllerRoute(

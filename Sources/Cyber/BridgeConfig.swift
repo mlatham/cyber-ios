@@ -22,7 +22,7 @@ public struct BridgeConfig {
 
 	/// Config used when none is provided to WebView and WebViewController.
     public static var `default` = {
-		var config = try? BridgeConfig(
+		var config = try! BridgeConfig(
 			routes: ["*"],
 			subdirectory: "dist")
 		

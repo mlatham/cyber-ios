@@ -28,7 +28,7 @@ public struct WebViewControllerRepresentable: UIViewControllerRepresentable {
 	
 	public init(
 		route: String,
-		bridgeConfig: BridgeConfig = BridgeConfig.default!,
+		bridgeConfig: BridgeConfig = BridgeConfig.default,
 		webViewConfig: WKWebViewConfiguration? = nil) {
 		self.webViewController = WebViewController(
 			route: route,

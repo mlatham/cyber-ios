@@ -21,7 +21,7 @@ open class WebViewController: UIViewController {
 
 	public init(
 		route: String,
-		bridgeConfig: BridgeConfig = BridgeConfig.default!,
+		bridgeConfig: BridgeConfig = BridgeConfig.default,
 		webViewConfig: WKWebViewConfiguration? = nil) {
 		webView = WebView(
 			route: route,
